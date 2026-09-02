@@ -22,9 +22,10 @@ import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';
 import { supabase } from '../lib/supabase.js';
+import { requireAuth } from '../middleware/auth.js';
 const router = Router();
 const orderSchema = z.object({ customer_name: z.string().trim().min(2).max(120), customer_email: z.string().email().max(160), customer_phone: z.string().trim().max(30).optional(), delivery_address: z.string().trim().min(5).max(300), notes: z.string().trim().max(500).optional(), items: z.array(z.object({ product_id: z.string().uuid(), quantity: z.number().int().min(1).max(20) })).min(1).max(30) });
-router.get('/', (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () { try {
+router.get('/', requireAuth, (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () { try {
     const { data, error } = yield supabase.from('orders').select('id,customer_name,customer_email,delivery_address,status,total,created_at,order_items(product_name,quantity,subtotal)').order('created_at', { ascending: false });
     if (error)
         throw error;
