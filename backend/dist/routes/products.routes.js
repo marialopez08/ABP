@@ -22,6 +22,15 @@ router.get('/', (_req, res, next) => __awaiter(void 0, void 0, void 0, function*
 catch (e) {
     next(e);
 } }));
+router.get('/admin', requireAuth, (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () { try {
+    const { data, error } = yield supabase.from('products').select('id,name,description,price,category,image_url,stock,active').order('created_at', { ascending: false });
+    if (error)
+        throw error;
+    res.json({ data: data !== null && data !== void 0 ? data : [] });
+}
+catch (e) {
+    next(e);
+} }));
 router.post('/', requireAuth, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () { try {
     const parsed = productSchema.parse(req.body);
     const { data, error } = yield supabase.from('products').insert(parsed).select().single();
