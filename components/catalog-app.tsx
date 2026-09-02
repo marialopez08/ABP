@@ -17,7 +17,11 @@ const imageByProduct: Record<string, string> = {
   'Lápices de color': 'https://images.unsplash.com/photo-1513542992587-bb1e29a4c9c7?auto=format&fit=crop&w=800&q=85',
   'Organizador de cables': 'https://images.unsplash.com/photo-1616628182501-4f6f6c7f2f16?auto=format&fit=crop&w=800&q=85',
 }
-const imageFor = (product: Product) => product.image_url || imageByProduct[product.name] || '/products/notebook.png'
+const imageFor = (product: Product) => {
+  const source = product.image_url || imageByProduct[product.name] || '/products/notebook.png'
+  // Las rutas guardadas en Supabase son assets del frontend; las URLs externas siguen funcionando directamente.
+  return source.startsWith('/') ? source : source
+}
 
 const fallback: Product[] = [
   { id: '00000000-0000-4000-8000-000000000001', name: 'Cuaderno ejecutivo', description: 'Tapa dura, papel premium y 120 páginas.', price: 12900, category: 'Papelería', image_url: '/products/notebook.png', stock: 24, active: true },
@@ -40,7 +44,18 @@ export function CatalogApp() {
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
 
-  useEffect(() => { api.products().then(setProducts).catch(() => setProducts(fallback)) }, [])
+  useEffect(() => {
+    api.products()
+      .then((items) => {
+        setProducts(items)
+        setError('')
+      })
+      .catch((requestError) => {
+        console.error('[v0] No se pudo cargar el catálogo desde la API', requestError)
+        setProducts([])
+        setError('No se pudo cargar el catálogo. Verifica que la API Express esté disponible e inténtalo de nuevo.')
+      })
+  }, [])
   const categories = ['Todos', ...Array.from(new Set(products.map((p) => p.category)))]
   const filtered = useMemo(() => products.filter((p) => (category === 'Todos' || p.category === category) && `${p.name} ${p.description}`.toLowerCase().includes(query.toLowerCase())), [products, category, query])
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
@@ -52,12 +67,32 @@ export function CatalogApp() {
   }
   function change(id: string, delta: number) { setCart((current) => current.flatMap((item) => item.id !== id ? [item] : item.quantity + delta <= 0 ? [] : [{ ...item, quantity: Math.min(item.quantity + delta, item.stock) }])) }
   async function submitOrder(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setError('')
+    event.preventDefault()
+    setError('')
     const form = new FormData(event.currentTarget)
     try {
+      // Confirmamos contra el catálogo actual para no enviar IDs de un catálogo alterno o desactualizado.
+      const latestProducts = await api.products()
+      const latestById = new Map(latestProducts.map((product) => [product.id, product]))
+      const unavailable = cart.find((item) => {
+        const latest = latestById.get(item.id)
+        return !latest || !latest.active || item.quantity > latest.stock
+      })
+      if (unavailable) {
+        setProducts(latestProducts)
+        setCart((current) => current.map((item) => {
+          const latest = latestById.get(item.id)
+          return latest ? { ...latest, quantity: Math.min(item.quantity, latest.stock) } : item
+        }).filter((item) => item.stock > 0))
+        throw new Error(`${unavailable.name} ya no tiene stock suficiente. Actualizamos el carrito; revisa las cantidades e inténtalo de nuevo.`)
+      }
       await api.createOrder({ customer_name: String(form.get('name') ?? '').trim(), customer_email: String(form.get('email') ?? '').trim(), customer_phone: String(form.get('phone') ?? '').trim() || undefined, delivery_address: String(form.get('address') ?? '').trim(), notes: String(form.get('notes') ?? '').trim() || undefined, items: cart.map((item) => ({ product_id: item.id, quantity: item.quantity })) })
-      setCart([]); setPanel(null); setSent(true)
-    } catch (e) { setError(e instanceof Error ? e.message : 'No se pudo crear el pedido. Verifica los datos e inténtalo nuevamente.') }
+      setCart([])
+      setPanel(null)
+      setSent(true)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudo crear el pedido. Verifica los datos e inténtalo nuevamente.')
+    }
   }
 
   return <main className="min-h-screen bg-background text-foreground">
