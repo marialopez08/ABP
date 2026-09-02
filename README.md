@@ -96,7 +96,7 @@ erDiagram
 
 ## 8. API REST
 
-Base URL: `http://localhost:4000` en desarrollo.
+Base URL: `http://localhost:4000` en desarrollo. En producción corresponde a la URL pública de Render (`https://abp-vdvm.onrender.com`). El frontend público usa `/api/orders` para crear pedidos; el backoffice usa `/api/admin/orders` para listar pedidos autenticados.
 
 | Método | Endpoint | Descripción |
 |---|---|---|
@@ -111,7 +111,38 @@ Base URL: `http://localhost:4000` en desarrollo.
 
 El frontend usa `NEXT_PUBLIC_API_URL` para consumir Express. Las respuestas siguen el formato `{ data }` y los errores `{ error }`.
 
-## 9. Seguridad y buenas prácticas
+## 9. Inicio de sesión y backoffice
+
+La autenticación administrativa usa **Supabase Auth con email y contraseña**, no una tabla `public.users` propia. Supabase registra las cuentas en `auth.users`, una tabla administrada dentro del esquema `auth`; por seguridad, la aplicación no inserta contraseñas directamente allí.
+
+### Acceso administrativo
+
+1. Crear o administrar la cuenta desde Supabase Auth Users. La cuenta de prueba configurada es `hela@test.com` con la contraseña entregada de forma privada.
+2. Abrir `/admin/login`.
+3. Iniciar sesión con email y contraseña mediante `supabase.auth.signInWithPassword`.
+4. Supabase devuelve un JWT de sesión que el frontend conserva en cookies administradas por `@supabase/ssr`.
+5. `/admin` valida la sesión con `supabase.auth.getUser()`. Si no existe sesión, redirige a `/admin/login`.
+6. Para consultar pedidos o modificar productos, el frontend envía `Authorization: Bearer <JWT>` al backend Express.
+7. Express valida el JWT con `supabase.auth.getUser(token)` antes de permitir las operaciones privadas.
+8. Cerrar sesión ejecuta `supabase.auth.signOut()` y devuelve al login.
+
+### Conexión del panel
+
+El panel usa la API Express desplegada en Render. Los productos administrativos se consultan en `GET /api/products/admin` y los pedidos en `GET /api/admin/orders`; ambos requieren JWT. El endpoint público `POST /api/orders` registra pedidos sin login y recalcula precios/total en el servidor. Los pedidos sí quedan persistidos en `public.orders` y sus líneas en `public.order_items`; por ejemplo, la verificación de base de datos encontró pedidos registrados y sus ítems. Si el panel muestra “Ruta no encontrada”, hay que redesplegar el backend para publicar el alias `/api/admin/orders` incluido en este repositorio.
+
+### Modelo de datos de autenticación
+
+```text
+auth.users (Supabase Auth)
+       1
+       │
+       0..1
+public.profiles (opcional para datos públicos del usuario)
+```
+
+No se requiere crear una tabla pública `users` para iniciar sesión. Si en el futuro se necesitan nombre, rol o preferencias, se debe crear `public.profiles` con `id uuid references auth.users(id)` y protegerla con RLS.
+
+## 10. Seguridad y buenas prácticas
 
 - Validación y sanitización de entradas con Zod en Express y restricciones SQL.
 - Consultas Supabase parametrizadas; no se construyen consultas SQL con strings del usuario.

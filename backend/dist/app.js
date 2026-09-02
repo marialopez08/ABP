@@ -9,6 +9,8 @@ app.use(express.json({ limit: '100kb' }));
 app.get('/health', (_req, res) => res.json({ ok: true, service: 'abp-backend' }));
 app.use('/api/products', productsRouter);
 app.use('/api/orders', ordersRouter);
+// Alias explícito para el backoffice: mantiene separada la lectura administrativa.
+app.use('/api/admin/orders', ordersRouter);
 app.use((_req, res) => res.status(404).json({ error: 'Ruta no encontrada' }));
 app.use((error, _req, res, _next) => {
     console.error('[ABP backend]', error);
