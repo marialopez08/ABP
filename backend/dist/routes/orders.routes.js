@@ -18,6 +18,7 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
+import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';
 import { supabase } from '../lib/supabase.js';
@@ -44,13 +45,14 @@ router.post('/', (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         throw new Error(`Stock insuficiente para ${product.name}`); return { product_id: product.id, product_name: product.name, unit_price: product.price, quantity: item.quantity, subtotal: Number(product.price) * item.quantity }; });
     const total = items.reduce((sum, item) => sum + item.subtotal, 0);
     const { items: _ } = body, order = __rest(body, ["items"]);
-    const { data: created, error } = yield supabase.from('orders').insert(Object.assign(Object.assign({}, order), { total })).select('id,customer_name,customer_email,total,status,created_at').single();
+    const orderId = randomUUID();
+    const { error } = yield supabase.from('orders').insert(Object.assign(Object.assign({ id: orderId }, order), { total, status: 'pending' }));
     if (error)
         throw error;
-    const { error: itemsError } = yield supabase.from('order_items').insert(items.map(item => (Object.assign(Object.assign({}, item), { order_id: created.id }))));
+    const { error: itemsError } = yield supabase.from('order_items').insert(items.map(item => (Object.assign(Object.assign({}, item), { order_id: orderId }))));
     if (itemsError)
         throw itemsError;
-    res.status(201).json({ data: created });
+    res.status(201).json({ data: Object.assign(Object.assign({ id: orderId }, order), { total, status: 'pending', created_at: new Date().toISOString() }) });
 }
 catch (e) {
     next(e);

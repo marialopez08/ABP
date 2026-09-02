@@ -1,4 +1,4 @@
-# Mercado Norte — ABP
+# Maxima Kraft — ABP
 
 Aplicación web full-stack para centralizar el catálogo y la recepción de pedidos de pequeños negocios. El proyecto responde a la problemática de gestionar productos y ventas mediante WhatsApp, cuadernos y mensajes dispersos, reduciendo errores de registro y mejorando la trazabilidad.
 

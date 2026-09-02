@@ -3,8 +3,8 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Mercado Norte | ABP',
-  description: 'Catálogo y pedidos sencillos para Mercado Norte.',
+  title: 'Maxima Kraft | ABP',
+  description: 'Catálogo y pedidos sencillos para Maxima Kraft.',
   generator: 'ABP — María Isabel López Figueroa',
   icons: {
     icon: [

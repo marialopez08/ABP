@@ -5,10 +5,10 @@ import { ArrowRight, Check, Minus, Plus, Search, ShoppingBag, Sparkles, X } from
 import { api, type Product } from '@/lib/api'
 
 type CartItem = Product & { quantity: number }
-const money = (value: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value)
+const money = (value: number) => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(value < 1000 ? value * 1000 : value)
 const fallback: Product[] = [
   { id: '00000000-0000-4000-8000-000000000001', name: 'Cuaderno ejecutivo', description: 'Tapa dura, papel premium y 120 páginas.', price: 12900, category: 'Papelería', image_url: '/products/notebook.png', stock: 24, active: true },
-  { id: '00000000-0000-4000-8000-000000000002', name: 'Kit de escritorio', description: 'Organiza tu espacio con estilo y funcionalidad.', price: 18.5, category: 'Accesorios', image_url: '/products/desk-kit.png', stock: 12, active: true },
+  { id: '00000000-0000-4000-8000-000000000002', name: 'Kit de escritorio', description: 'Organiza tu espacio con estilo y funcionalidad.', price: 18500, category: 'Accesorios', image_url: '/products/desk-kit.png', stock: 12, active: true },
   { id: '00000000-0000-4000-8000-000000000003', name: 'Termo térmico', description: 'Acero inoxidable, 500 ml, conserva la temperatura.', price: 22, category: 'Hogar', image_url: '/products/thermos.png', stock: 18, active: true },
   { id: '00000000-0000-4000-8000-000000000004', name: 'Mochila urbana', description: 'Diseño ligero para trabajo, estudio y movilidad.', price: 38900, category: 'Accesorios', image_url: '/products/backpack.png', stock: 8, active: true },
   { id: '00000000-0000-4000-8000-000000000005', name: 'Set de marcadores', description: 'Colores intensos para apuntes, lettering y proyectos.', price: 15900, category: 'Arte', image_url: '/products/desk-kit.png', stock: 20, active: true },
