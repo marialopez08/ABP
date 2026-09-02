@@ -1,0 +1,5 @@
+export type Product = { id: string; name: string; description: string; price: number; category: string; image_url: string | null; stock: number; active: boolean }
+export type Order = { id: string; customer_name: string; customer_email: string; delivery_address: string; status: string; total: number; created_at: string }
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'
+async function request<T>(path: string, init?: RequestInit): Promise<T> { const response = await fetch(`${API_URL}${path}`, { ...init, headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) } }); const body = await response.json().catch(() => ({})); if (!response.ok) throw new Error(body.error ?? 'No se pudo completar la solicitud'); return body.data as T }
+export const api = { products: () => request<Product[]>('/api/products'), orders: () => request<Order[]>('/api/orders'), createOrder: (payload: unknown) => request<Order>('/api/orders', { method: 'POST', body: JSON.stringify(payload) }) }
