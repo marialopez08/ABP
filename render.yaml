@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: maxima-kraft-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+
+# En Render, configura FRONTEND_URL con la URL pública de Vercel.
+# Nunca guardes valores reales de Supabase en este archivo.
