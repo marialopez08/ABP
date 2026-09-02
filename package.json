@@ -1,0 +1,45 @@
+{
+  "name": "my-project",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n frontend,backend -c cyan,green \"next dev\" \"pnpm backend:dev\"",
+    "dev:frontend": "next dev",
+    "backend:dev": "tsx watch backend/src/server.ts",
+    "backend:build": "tsc -p backend/tsconfig.json",
+    "backend:start": "node backend/dist/server.js",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@base-ui/react": "^1.5.0",
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.112.4",
+    "@vercel/analytics": "1.6.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "lucide-react": "^1.16.0",
+    "next": "16.3.3",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "shadcn": "^4.11.0",
+    "tailwind-merge": "^3.3.1",
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "concurrently": "^10.0.5",
+    "postcss": "^8.5",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.13",
+    "typescript": "5.7.3"
+  }
+}
