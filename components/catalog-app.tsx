@@ -8,14 +8,14 @@ import { api, type Product } from '@/lib/api'
 type CartItem = Product & { quantity: number }
 const money = (value: number) => `COP ${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', currencyDisplay: 'symbol', maximumFractionDigits: 0 }).format(value < 1000 ? value * 1000 : value)}`
 const imageByProduct: Record<string, string> = {
-  'Cuaderno ejecutivo': 'https://images.unsplash.com/photo-1531346878377-a5be20888e57?auto=format&fit=crop&w=800&q=85',
-  'Kit de escritorio': 'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&w=800&q=85',
-  'Termo térmico': 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=800&q=85',
-  'Mochila urbana': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=85',
-  'Set de marcadores': 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=85',
-  'Agenda semanal': 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=800&q=85',
-  'Lápices de color': 'https://images.unsplash.com/photo-1513542992587-bb1e29a4c9c7?auto=format&fit=crop&w=800&q=85',
-  'Organizador de cables': 'https://images.unsplash.com/photo-1616628182501-4f6f6c7f2f16?auto=format&fit=crop&w=800&q=85',
+  'Cuaderno ejecutivo': '/products/notebook.png',
+  'Kit de escritorio': '/products/desk-kit.png',
+  'Termo térmico': '/products/thermos.png',
+  'Mochila urbana': '/products/backpack.png',
+  'Set de marcadores': '/products/markers.png',
+  'Agenda semanal': '/products/agenda.png',
+  'Lápices de color': '/products/colored-pencils.png',
+  'Organizador de cables': '/products/cable-organizer.png',
 }
 const imageFor = (product: Product) => {
   const source = product.image_url || imageByProduct[product.name] || '/products/notebook.png'
