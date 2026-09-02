@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "concurrently -n frontend,backend -c cyan,green \"next dev\" \"pnpm backend:dev\"",
     "dev:frontend": "next dev",
-    "backend:dev": "tsx watch backend/src/server.ts",
+    "backend:dev": "node --env-file-if-exists=.env.development.local --import tsx/esm --watch backend/src/server.ts",
     "backend:build": "tsc -p backend/tsconfig.json",
     "backend:start": "node backend/dist/server.js",
     "build": "next build",

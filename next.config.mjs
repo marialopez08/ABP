@@ -6,6 +6,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  async rewrites() {
+    return [{
+      source: '/backend-api/:path*',
+      destination: 'https://abp-vdvm.onrender.com/:path*',
+    }]
+  },
 }
 
 export default nextConfig
