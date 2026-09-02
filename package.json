@@ -2,6 +2,10 @@
   "name": "my-project",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.0.0",
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  },
   "scripts": {
     "dev": "concurrently -n frontend,backend -c cyan,green \"next dev\" \"pnpm backend:dev\"",
     "dev:frontend": "next dev",
